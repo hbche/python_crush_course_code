@@ -523,29 +523,931 @@ print(f"My dog's age is {my_dog.age}")
 
 2. 调用方法
 
+   使用点好访问类实例上的任何方法。
+
+3. 创建多个实例
+
+   可按需求根据类创建任意数量的实例。
+
+#### 9.1.3 动手试一试
+
+```python
+# 练习9.1：餐馆　创建一个名为Restaurant的类，为其__init__()方法设置两个属性：restaurant_name和cuisine_type。
+# 创建一个名为describe_restaurant()的方法和一个名为open_restaurant()的方法，其中前者打印前述两项信息，而后者打印一条消息，指出餐馆正在营业。
+# 根据这个类创建一个名为restaurant的实例，分别打印其两个属性，再调用前述两个方法。
+
+# class Restaurant:
+#     def __init__(self, restaurant_name, cuisine_type):
+#         self.restaurant_name = restaurant_name
+#         self.cuisine_type = cuisine_type
+
+
+#     def describe_restaurant(self):
+#         print(f"{self.restaurant_name} is {self.cuisine_type}")
+
+
+#     def open_restaurant(self):
+#         print(f"Restaurant is open now.")
+
+
+# restaurant = Restaurant('Beijing Big Restaurant', 'Chinses food')
+# print(f"The name of restaurant is: {restaurant.restaurant_name}, cuisine type is {restaurant.cuisine_type}.")
+# restaurant.describe_restaurant()
+# restaurant.open_restaurant()
+
+# 练习9.2：三家餐馆　根据为练习9.1编写的类创建三个实例，并对每个实例调用describe_restaurant()方法。
+
+# restaurant_01 = Restaurant('黄鹤楼酒店', '湖北菜')
+# restaurant_02 = Restaurant('成都大酒店', '川菜')
+# restaurant_03 = Restaurant('山东大酒店', '鲁菜')
+# restaurant_01.describe_restaurant()
+# restaurant_02.describe_restaurant()
+# restaurant_03.describe_restaurant()
+
+# 练习9.3：用户　创建一个名为User的类，其中包含属性first_name和last_name，还有用户简介中通常会有的其他几个属性。
+# 在类User中定义一个名为describe_user()的方法，用于打印用户信息摘要。
+# 再定义一个名为greet_user()的方法，用于向用户发出个性化的问候。
+# 创建多个表示不同用户的实例，并对每个实例调用上述两个方法。
+class User:
+    def __init__(self, first_name, last_name):
+        self.first_name = first_name
+        self.last_name = last_name
+
+
+    def describe_user(self):
+        print(f"Fullname is {self.first_name.title()} {self.last_name.title()}.")
+
+
+    def greet_user(self):
+        print(f"Hello, {self.first_name}!")
+
+
+user_01 = User('Lucy', 'Green')
+user_01.describe_user()
+user_02 = User('Sam', 'Alt')
+user_02.describe_user()
+```
+
 ### 9.2 使用类和实例
+
+既可以直接修改实例的属性，也可以编写函数修改实例属性。
 
 #### 9.2.1 Car 类
 
+```python car.py
+class Car:
+    """一次模拟汽车的简单尝试"""
+
+
+    def __init__(self, make, model, year):
+        """初始化描述汽车的属性， 制造商、型号、生产年份"""
+        self.make = make
+        self.model = model
+        self.year = year
+
+
+    def get_descriptive_name(self):
+        """返回格式规范的描述信息"""
+        long_name = f"{self.year} {self.make} {self.model}"
+        return long_name
+
+
+my_new_car = Car('audi', 'a4', 2024)
+print(my_new_car.get_descriptive_name())
+```
+
 #### 9.2.2 给属性指定默认值
+
+有些属性无需通过参数来定义，可以在 `__init__()` 方法中为其指定默认值。
+
+```python
+class Car:
+    """一次模拟汽车的简单尝试"""
+
+
+    def __init__(self, make, model, year):
+        """初始化描述汽车的属性"""
+        self.make = make
+        self.model = model
+        self.year = year
+        # 新增里程参数，并指定默认值为 0
+        self.odometer_reading = 0
+
+
+    def get_descriptive_name(self):
+        """返回格式规范的描述信息"""
+        long_name = f"{self.year} {self.make} {self.model}"
+        return long_name
+
+
+    def read_odometer(self):
+        print(f"This car has {self.odometer_reading} miles on it.")
+
+
+my_new_car = Car('audi', 'a4', 2024)
+print(my_new_car.get_descriptive_name())
+my_new_car.read_odometer()
+```
 
 #### 9.2.3 修改属性的值
 
+可以使用三种不同的方式修改属性值：直接通过实例修改，通过方法设置，以及通过方法递增(增加特定的值)。
+
+1. 直接修改属性值
+
+   ```python
+   class Car:
+   --skip--
+
+   my_new_car = Car('audi', 'a4', 2024)
+   print(my_new_car.get_descriptive_name())
+
+   my_new_car.odometer_reading = 23
+   my_new_car.read_odometer()
+   ```
+
+2. 通过方法修改属性的值
+
+   ```python
+   class Car:
+   """一次模拟汽车的简单尝试"""
+
+
+   def __init__(self, make, model, year):
+       """初始化描述汽车的属性"""
+       self.make = make
+       self.model = model
+       self.year = year
+       # 里程
+       self.odometer_reading = 0
+
+
+   def get_descriptive_name(self):
+       """返回格式规范的描述信息"""
+       long_name = f"{self.year} {self.make} {self.model}"
+        return long_name
+
+   def read_odometer(self):
+       """打印一条指出汽车行驶里程的消息"""
+       print(f"This car has {self.odometer_reading} miles on it.")
+
+
+   def update_odometer(self, mileage):
+       """将里程表读数设置为指定的值，禁止将里程数往回调"""
+       if mileage >= self.odometer_reading:
+           self.odometer_reading = mileage
+       else:
+           print("You can't roll back an odometer!")
+
+   my_new_car = Car('audi', 'a4', 2024)
+   print(my_new_car.get_descriptive_name())
+   my_new_car.read_odometer()
+   my_new_car.update_odometer(200)
+   my_new_car.read_odometer()
+   ```
+
+3. 通过方法让属性值递增
+
+   ```python
+   class Car:
+   """一次模拟汽车的简单尝试"""
+
+
+   def __init__(self, make, model, year):
+       """初始化描述汽车的属性"""
+       self.make = make
+       self.model = model
+       self.year = year
+       # 里程
+       self.odometer_reading = 0
+
+
+   def get_descriptive_name(self):
+       """返回格式规范的描述信息"""
+       long_name = f"{self.year} {self.make} {self.model}"
+       return long_name
+
+
+   def read_odometer(self):
+       """打印一条指出汽车行驶里程的消息"""
+       print(f"This car has {self.odometer_reading} miles on it.")
+
+
+   def update_odometer(self, mileage):
+       """将里程表读数设置为指定的值，禁止将里程数往回调"""
+       if mileage >= self.odometer_reading:
+           self.odometer_reading = mileage
+       else:
+           print("You can't roll back an odometer!")
+
+
+   def increase_odometer(self, miles):
+       """让里程表读数增加指定的量"""
+       if miles > 0:
+           self.odometer_reading += miles
+       else:
+           print("You can't roll back an odometer!")
+   ```
+
+#### 9.2.4 动手试一试
+
+```python
+# 练习9.4：就餐人数　在为练习9.1编写的程序中，添加一个名为number_served的属性，并将其默认值设置为0。
+# 根据这个类创建一个名为restaurant的实例。
+# 打印有多少人在这家餐馆就餐过，然后修改这个值并再次打印。
+# 添加一个名为set_number_served()的方法，用来设置就餐人数。
+# 调用这个方法并向它传递新的就餐人数，然后再次打印这个值。
+# 添加一个名为increment_number_served()的方法，用来让就餐人数递增。
+# 调用这个方法并向它传递一个这样的值：你认为这家餐馆每天可能接待的就餐人数。
+
+# class Restaurant:
+#     """模拟一个餐厅"""
+
+
+#     def __init__(self, restaurant_name, cuisine_type, desc):
+#         """初始化餐厅属性，餐厅名称、烹饪风格、desc"""
+#         self.restaurant_name = restaurant_name
+#         self.cuisine_type = cuisine_type
+#         self.desc = desc
+#         # 就餐人数，默认为 0
+#         self.number_served =  0
+
+
+#     def get_restaurant_desc(self):
+#         print(f"{self.restaurant_name.title()} is {self.cuisine_type} reataurant.")
+#         print(f"{self.desc}")
+
+
+#     def describe_number_served(self):
+#         """打印在这个餐厅就餐过的人数"""
+#         print(f"This restaurant has served {self.number_served} customers.")
+
+
+#     def set_number_served(self, number_served):
+#         """更新就餐历史人数"""
+#         if number_served >= self.number_served:
+#             self.number_served = number_served
+#         else:
+#             print("You can't roll back the number served.")
+
+
+#     def increment_number_served(self, increment_num):
+#         if increment_num >= 0:
+#             self.number_served += increment_num
+#         else:
+#             print("You can't roll back the number served.")
+
+
+# restaurant = Restaurant('Quanjude', 'Chinese Roast Duck Cuisine（中式烤鸭料理）', '全聚德是北京极具代表性的老字号餐厅，创立于1864年，在国内外都享有盛誉。')
+# restaurant.get_restaurant_desc()
+# restaurant.describe_number_served()
+# restaurant.set_number_served(100_000)
+# restaurant.describe_number_served()
+# restaurant.increment_number_served(100)
+# restaurant.describe_number_served()
+
+# 练习9.5：尝试登录次数　在为练习9.3编写的User类中，添加一个名为login_attempts的属性。
+# 编写一个名为increment_login_attempts()的方法，用来将属性login_attempts的值加1。
+# 再编写一个名为reset_login_attempts()的方法，用来将属性login_attempts的值重置为0。
+# 根据User类创建一个实例，再调用increment_login_attempts()方法多次。
+# 打印属性login_attempts的值，确认它正确地递增了。
+# 然后，调用方法reset_login_attempts()，并再次打印属性login_attempts的值，确认它被重置为0。
+
+class User:
+    """模拟用户登录信息"""
+
+
+    def __init__(self, first_name, last_name, login_attempts):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.login_attempts = login_attempts
+
+
+    def describe_login_attempts(self):
+        print(f"You have attempted to log in {self.login_attempts} times.")
+
+
+    def increment_login_attempts(self, login_attempts):
+        self.login_attempts = login_attempts
+
+
+    def reset_login_attempts(self):
+        self.login_attempts = 0
+
+
+user = User('Robin', 'Che', 0)
+user.describe_login_attempts()
+user.increment_login_attempts(10)
+user.describe_login_attempts()
+user.reset_login_attempts()
+user.describe_login_attempts()
+```
+
 ### 9.3 继承
 
-#### 9.3.1 子类的**init()**方法
+在编写类时，并非总是要从头开始。如果要编写的类是一个既有的类的特殊版本，可使用继承(inheritance)。当一个类继承另一个类时，将自动获得后者的所有属性和方法。原有的类称为父类(parent class)，而新类称为子类(child class)。子类不仅继承了父类的所有属性和方法，还可定义自己的属性和方法。
+
+#### 9.3.1 子类的`__init__()`方法
+
+在既有的类的基础上编写新类，通常要调用父类的**init**()方法。这将初始化在父类的**init**()方法中定义的所有属性，从而让子类也可以使用这些属性。
+
+```python electric_car.py
+class Car:
+    """模拟一辆汽车"""
+
+
+    def __init__(self, make, model, year):
+        """初始化描述汽车的属性"""
+        self.make = make
+        self.model = model
+        self.year = year
+        self.odometer_reading = 0
+
+
+    def get_descriptive_name(self):
+        long_name = f"{self.year} {self.make} {self.model}"
+        return long_name.title()
+
+
+    def read_odometer(self):
+        """打印一个句子，显示汽车的行驶里程"""
+        print(f"The car has {self.odometer_reading} miles on it.")
+
+
+    def update_odometer(self, miles):
+        """将里程表读数设置为指定的值"""
+        if miles >= self.odometer_reading:
+            self.odometer_reading = miles
+        else:
+            print("You can't roll back an odometer.")
+
+
+    def increment_odometer(self, miles):
+        """让里程表读数增加给定的值"""
+        self.odometer_reading += miles
+
+
+class ElectricCar(Car):
+    """模拟一辆电动汽车"""
+
+
+    def __init__(self, make, model, year):
+        """初始化父类的属性"""
+        super().__init__(make, model, year)
+
+
+my_leaf = ElectricCar('nissan', 'leaf', 2024)
+print(my_leaf.get_descriptive_name())
+```
+
+`super()`是一个特殊的函数，让我们能够调用父类的方法。这行代码让 Python 调用 Car 类的`__init__()`方法，从而让 ElectricCar 实例包含这个方法定义的所有属性。
 
 #### 9.3.2 给子类定义属性和方法
 
+让一个类继承另一个类后，就可以添加区分子类和父类所需的新属性和新方法了。
+
+```python electric_car.py
+class Car:
+    """模拟一辆汽车"""
+
+
+    def __init__(self, make, model, year):
+        """初始化描述汽车的属性"""
+        self.make = make
+        self.model = model
+        self.year = year
+        self.odometer_reading = 0
+
+
+    def get_descriptive_name(self):
+        long_name = f"{self.year} {self.make} {self.model}"
+        return long_name.title()
+
+
+    def read_odometer(self):
+        """打印一个句子，显示汽车的行驶里程"""
+        print(f"The car has {self.odometer_reading} miles on it.")
+
+
+    def update_odometer(self, miles):
+        """将里程表读数设置为指定的值"""
+        if miles >= self.odometer_reading:
+            self.odometer_reading = miles
+        else:
+            print("You can't roll back an odometer.")
+
+
+    def increment_odometer(self, miles):
+        """让里程表读数增加给定的值"""
+        self.odometer_reading += miles
+
+
+class ElectricCar(Car):
+    """模拟一辆电动汽车"""
+
+
+    def __init__(self, make, model, year):
+        """初始化父类的属性"""
+        super().__init__(make, model, year)
+        # 添加电动汽车特有的属性
+        self.battery_size = 40
+
+
+    def describe_battery(self):
+        """打印一条消息，描述电池的容量"""
+        print(f"This car has {self.battery_size}-kWh battery.")
+
+
+my_leaf = ElectricCar('nissan', 'leaf', 2024)
+print(my_leaf.get_descriptive_name())
+my_leaf.describe_battery()
+```
+
 #### 9.3.3 重写父类中的方法
+
+在使用子类模拟的实物的行为时，如果父类中的一些方法不能满足子类的需求，就可以用下面的办法重写：在子类中定义一个与要重写的父类方法同名的方法。这样，Python 将忽略这个父类方法，只关注你在子类中定义的相应方法。
+
+假设 Car 类有一个 `fill_gas_tank` 的方法，但是电动汽车不需要油箱。
+
+```python
+class Car:
+    """模拟一辆汽车"""
+
+
+    def __init__(self, make, model, year):
+        """初始化描述汽车的属性"""
+        self.make = make
+        self.model = model
+        self.year = year
+        self.odometer_reading = 0
+
+
+    def get_descriptive_name(self):
+        long_name = f"{self.year} {self.make} {self.model}"
+        return long_name.title()
+
+
+    def read_odometer(self):
+        """打印一个句子，显示汽车的行驶里程"""
+        print(f"The car has {self.odometer_reading} miles on it.")
+
+
+    def update_odometer(self, miles):
+        """将里程表读数设置为指定的值"""
+        if miles >= self.odometer_reading:
+            self.odometer_reading = miles
+        else:
+            print("You can't roll back an odometer.")
+
+
+    def increment_odometer(self, miles):
+        """让里程表读数增加给定的值"""
+        self.odometer_reading += miles
+
+
+    def fill_gas_tank(self):
+        """汽车有油箱，此处强调加满一箱油"""
+        print("This car has a gas tank! Please get a full tank of gas.")
+
+
+class ElectricCar(Car):
+    """模拟一辆电动汽车"""
+
+
+    def __init__(self, make, model, year):
+        """初始化父类的属性"""
+        super().__init__(make, model, year)
+        # 添加电动汽车特有的属性
+        self.battery_size = 40
+
+
+    def describe_battery(self):
+        """打印一条消息，描述电池的容量"""
+        print(f"This car has {self.battery_size}-kWh battery.")
+
+
+    def fill_gas_tank(self):
+        """重写父类的方法，电动汽车没有油箱"""
+        print("This car doesn't have a gas tank!")
+
+
+my_leaf = ElectricCar('nissan', 'leaf', 2024)
+print(my_leaf.get_descriptive_name())
+my_leaf.describe_battery()
+my_leaf.fill_gas_tank()
+```
+
+现在，如果有人对电动汽车调用 `fill_gas_tank()` 方法，Python 将忽略 Car 类中的 `fill_gas_tank()` 方法，转而运行上述代码。在使用继承时，可让子类保留从父类那里继承的“精华”​，重写不需要的“糟粕”​。
 
 #### 9.3.4 将实例用作属性
 
+在使用代码模拟实物时，你可能会发现自己给类添加了太多细节：属性和方法越来越多，文件越来越长。在这种情况下，可能需要将类的一部分提取出来，作为一个独立的类。将大型类拆分成多个协同工作的小类，这种方法称为组合(composition)。
+
+```python electric_car.py
+class Car:
+    """模拟一辆汽车"""
+
+
+    def __init__(self, make, model, year):
+        """初始化描述汽车的属性"""
+        self.make = make
+        self.model = model
+        self.year = year
+        self.odometer_reading = 0
+
+
+    def get_descriptive_name(self):
+        long_name = f"{self.year} {self.make} {self.model}"
+        return long_name.title()
+
+
+    def read_odometer(self):
+        """打印一个句子，显示汽车的行驶里程"""
+        print(f"The car has {self.odometer_reading} miles on it.")
+
+
+    def update_odometer(self, miles):
+        """将里程表读数设置为指定的值"""
+        if miles >= self.odometer_reading:
+            self.odometer_reading = miles
+        else:
+            print("You can't roll back an odometer.")
+
+
+    def increment_odometer(self, miles):
+        """让里程表读数增加给定的值"""
+        self.odometer_reading += miles
+
+
+    def fill_gas_tank(self):
+        """汽车有油箱，此处强调加满一箱油"""
+        print("This car has a gas tank! Please get a full tank of gas.")
+
+
+class Battery:
+    """模拟电动车电池"""
+
+
+    def __init__(self, battery_size = 40):
+        """初始化电池的属性"""
+        self.battery_size = battery_size
+
+
+    def describe_battery(self):
+        """打印一条描述电池容量的消息"""
+        print(f"This car has a {self.battery_size}-kWh battery.")
+
+
+class ElectricCar(Car):
+    """模拟一辆电动汽车"""
+
+
+    def __init__(self, make, model, year):
+        """初始化父类的属性"""
+        super().__init__(make, model, year)
+        # 添加电动汽车特有的属性
+        self.battery = Battery()
+
+
+    def fill_gas_tank(self):
+        """重写父类的方法，电动汽车没有油箱"""
+        print("This car doesn't have a gas tank!")
+
+
+my_leaf = ElectricCar('nissan', 'leaf', 2024)
+print(my_leaf.get_descriptive_name())
+my_leaf.battery.describe_battery()
+```
+
+给 Battery 类新增一个 `get_range()` 方法，打印电量对应的行驶里程。
+
+```python
+class Car:
+    """模拟一辆汽车"""
+
+
+    def __init__(self, make, model, year):
+        """初始化描述汽车的属性"""
+        self.make = make
+        self.model = model
+        self.year = year
+        self.odometer_reading = 0
+
+
+    def get_descriptive_name(self):
+        long_name = f"{self.year} {self.make} {self.model}"
+        return long_name.title()
+
+
+    def read_odometer(self):
+        """打印一个句子，显示汽车的行驶里程"""
+        print(f"The car has {self.odometer_reading} miles on it.")
+
+
+    def update_odometer(self, miles):
+        """将里程表读数设置为指定的值"""
+        if miles >= self.odometer_reading:
+            self.odometer_reading = miles
+        else:
+            print("You can't roll back an odometer.")
+
+
+    def increment_odometer(self, miles):
+        """让里程表读数增加给定的值"""
+        self.odometer_reading += miles
+
+
+    def fill_gas_tank(self):
+        """汽车有油箱，此处强调加满一箱油"""
+        print("This car has a gas tank! Please get a full tank of gas.")
+
+
+class Battery:
+    """模拟电动车电池"""
+
+
+    def __init__(self, battery_size = 40):
+        """初始化电池的属性"""
+        self.battery_size = battery_size
+
+
+    def describe_battery(self):
+        """打印一条描述电池容量的消息"""
+        print(f"This car has a {self.battery_size}-kWh battery.")
+
+
+    def get_range(self):
+        if self.battery_size == 40:
+            range = 150
+        if self.battery_size == 65:
+            range = 225
+        print(f"This car can go about {range} miles on a full charge.")
+
+
+class ElectricCar(Car):
+    """模拟一辆电动汽车"""
+
+
+    def __init__(self, make, model, year):
+        """初始化父类的属性"""
+        super().__init__(make, model, year)
+        # 添加电动汽车特有的属性
+        self.battery = Battery()
+
+
+    def fill_gas_tank(self):
+        """重写父类的方法，电动汽车没有油箱"""
+        print("This car doesn't have a gas tank!")
+
+
+my_leaf = ElectricCar('nissan', 'leaf', 2024)
+print(my_leaf.get_descriptive_name())
+my_leaf.battery.describe_battery()
+my_leaf.battery.get_range()
+```
+
 #### 9.3.5 模拟实物
+
+在模拟较复杂的事物（如电动汽车）时，需要思考一些有趣的问题。续航里程是电池的属性还是汽车的属性呢？如果只描述一辆汽车，将 get_range()方法放在 Battery 类中也许是合适的，但如果要描述一家汽车制造商的整条产品线，也许应该将 get_range()方法移到 ElectricCar 类中。在这种情况下，get_range()依然根据电池容量来确定续航里程，但报告的是一款汽车的续航里程。也可以这样做：仍将 get_range()方法留在 Battery 类中，但向它传递一个参数，如 car_model。此时，get_range()方法将根据电池容量和汽车型号报告续航里程。这让你进入了程序员的另一个境界：在解决上述问题时，从较高的逻辑层面（而不是语法层面）思考。你考虑的不是 Python，而是如何使用代码来表示实际事物。达到这种境界后，你会经常发现，对现实世界的建模方法没有对错之分。有些方法的效率更高，但要找出效率最高的表示法，需要一定的实践。只要代码能够像你希望的那样运行，就说明你已经做得很好了！即便发现自己不得不多次尝试使用不同的方法来重写类，也不必气馁。要编写出高效、准确的代码，这是必经之路。
+
+#### 9.3.6 动手试一试
+
+```python
+# 练习9.6：冰激凌小店　冰激凌小店是一种特殊的餐馆。
+# 编写一个名为IceCreamStand的类，让它继承你为练习9.1或练习9.4编写的Restaurant类。
+# 这两个版本的Restaurant类都可以，挑选你更喜欢的那个即可。
+# 添加一个名为flavors的属性，用于存储一个由各种口味的冰激凌组成的列表。
+# 编写一个显示这些冰激凌口味的方法。创建一个IceCreamStand实例，并调用这个方法。
+
+# class Restaurant:
+#     """模拟一个餐饮店"""
+
+
+#     def __init__(self, restaurant_name, cuisine_type):
+#         """初始化餐饮店的属性"""
+#         self.restaurant_name = restaurant_name
+#         self.cusine_type = cuisine_type
+#         self.number_served = 0
+
+#     def get_number_served(self):
+#         print(f"This restaurant served about {self.number_served} people every!")
+
+
+#     def set_number_served(self, number_served):
+#         self.set_number_served = number_served
+
+
+# class IceCreamStand(Restaurant):
+
+#     def __init__(self, restaurant_name, cuisine_type):
+#         super().__init__(restaurant_name, cuisine_type)
+#         self.flavors = ['Vanilla', 'Mint Chocolate Chip', 'Tiramisu']
+
+
+#     def describe_flavors(self):
+#         print(f"This ice cream stand has {len(self.flavors)} flavors:")
+#         for flavor in self.flavors:
+#             print(f"-{flavor}")
+
+
+# ice_cream_stand = IceCreamStand('Mixue Ice Cream & Tea', 'Fast - food style drinks and desserts')
+# ice_cream_stand.describe_flavors()
+
+# 练习9.7：管理员　管理员是一种特殊的用户。
+# 编写一个名为Admin的类，让它继承你为练习9.3或练习9.5完成编写的User类。
+# 添加一个名为privileges的属性，用来存储一个由字符串（如"can add post"、"can delete post"、"can ban user"等）组成的列表。
+# 编写一个名为show_privileges()的方法，显示管理员的权限。
+# 创建一个Admin实例，并调用这个方法。
+
+# class User:
+#     """模拟一个用户类"""
+
+#     def __init__(self, first_name, last_name):
+#         """初始化用户信息"""
+#         self.first_name = first_name
+#         self.last_name = last_name
+
+
+#     def get_full_name(self):
+#         """打印一条消息展示用户全名"""
+#         return f"{self.first_name} {self.last_name}"
+
+
+# class Admin(User):
+#     """模拟管理员用户"""
+
+
+#     def __init__(self, first_name, last_name):
+#         """初始化用户和管理员用户属性"""
+#         super().__init__(first_name, last_name)
+#         self.privileges = ['can add post', 'can delete post', 'can ban user']
+
+
+#     def show_privileges(self):
+#         """打印一条消息展示管理员用户拥有的权限"""
+#         print(f"{self.get_full_name()} have some privileges:")
+#         for privilege in self.privileges:
+#             print(f"-{privilege}")
+
+
+# admin = Admin('Robin', 'Che')
+# admin.show_privileges()
+
+# 练习9.8：权限　编写一个名为Privileges的类，它只有一个属性privileges，其中存储了练习9.7所述的字符串列表。
+# 将方法show_privileges()移到这个类中。
+# 在Admin类中，将一个Privileges实例用作其属性。
+# 创建一个Admin实例，并使用方法show_privileges()来显示权限。
+# class User:
+#     """模拟一个用户类"""
+
+#     def __init__(self, first_name, last_name):
+#         """初始化用户信息"""
+#         self.first_name = first_name
+#         self.last_name = last_name
+
+
+#     def get_full_name(self):
+#         """打印一条消息展示用户全名"""
+#         return f"{self.first_name} {self.last_name}"
+
+
+# class Admin(User):
+#     """模拟管理员用户"""
+
+
+#     def __init__(self, first_name, last_name):
+#         """初始化用户和管理员用户属性"""
+#         super().__init__(first_name, last_name)
+#         self.privileges = Privileges()
+
+# class Privileges:
+#     """模拟权限"""
+
+
+#     def __init__(self):
+#         """初始化权限信息"""
+#         self.privileges = ['can add post', 'can delete post', 'can ban user']
+
+
+#     def show_privileges(self):
+#         print("Privileges: ")
+#         for privilege in self.privileges:
+#             print(f"-{privilege}")
+
+
+# admin = Admin('Robin', 'Che')
+# admin.privileges.show_privileges()
+
+# 练习9.9：电池升级　在本节最后一个electric_car.py版本中，给Battery类添加一个名为upgrade_battery()的方法。
+# 这个方法检查电池容量，如果电池容量不足65，就设置为65。
+# 创建一辆电池容量为默认值的电动汽车，调用方法get_range()，然后对电池进行升级，并再次调用get_range()。
+# 你将看到这辆汽车的续航里程增加了。
+
+class Battery:
+
+    def __init__(self, battery_size=40):
+        self.battery_size = battery_size
+
+
+    def upgrade_battery(self):
+        if self.battery_size < 65:
+            self.battery_size = 65
+
+
+    def get_range(self):
+        if self.battery_size == 40:
+            range = 150
+        if self.battery_size == 65:
+            range = 225
+        print(f"This car can go about {range} miles on a full charge.")
+
+class Car:
+
+    def __init__(self, make, model, year):
+        self.make = make
+        self.model = model
+        self.year = year
+
+
+    def get_descriptive_name(self):
+        long_name = f"{self.year} {self.make} {self.model}"
+        return long_name.title()
+
+class ElectricCar(Car):
+
+
+    def __init__(self, make, model, year):
+        super().__init__(make, model, year)
+        self.battery = Battery()
+
+electric_car = ElectricCar('audi', 'a4', 2024)
+electric_car.battery.get_range()
+electric_car.battery.upgrade_battery()
+electric_car.battery.get_range()
+```
 
 ### 9.4 导入类
 
+Python 允许我们将类声明在模块中，然后在主程序中导入所需的模块。
+
 #### 9.4.1 导入单个类
+
+将 Car 类的声明抽取到 car.py 模块中，我们在给使用 Car 类的程序单独声明一个 my_car.py 的文件，并在 my_car.py 中导入 car 模块中的 Car 类：
+
+```python car.py
+class Car:
+    """一次模拟汽车的简单尝试"""
+
+
+    def __init__(self, make, model, year):
+        """初始化描述汽车的属性"""
+        self.make = make
+        self.model = model
+        self.year = year
+        # 里程
+        self.odometer_reading = 0
+
+
+    def get_descriptive_name(self):
+        """返回格式规范的描述信息"""
+        long_name = f"{self.year} {self.make} {self.model}"
+        return long_name
+
+
+    def read_odometer(self):
+        """打印一条指出汽车行驶里程的消息"""
+        print(f"This car has {self.odometer_reading} miles on it.")
+
+
+    def update_odometer(self, mileage):
+        """将里程表读数设置为指定的值，禁止将里程数往回调"""
+        if mileage >= self.odometer_reading:
+            self.odometer_reading = mileage
+        else:
+            print("You can't roll back an odometer!")
+
+
+    def increase_odometer(self, miles):
+        """让里程表读数增加指定的量"""
+        if miles > 0:
+            self.odometer_reading += miles
+        else:
+            print("You can't roll back an odometer!")
+```
+
+```python my_car.py
+from car import Car
+
+my_new_car = Car('audi', 'a4', 2024)
+print(my_new_car.get_descriptive_name())
+my_new_car.read_odometer()
+# my_new_car.odometer_reading = 23
+# my_new_car.update_odometer(100)
+my_new_car.increase_odometer(10)
+my_new_car.read_odometer()
+```
+
+import 语句让 Python 打开模块 car 并导入其中的 Car 类。这样我们就可以使用 Car 类了。
 
 #### 9.4.2 在一个模块中存储多个类
 
