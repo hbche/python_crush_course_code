@@ -1783,10 +1783,133 @@ my_leaf = ec.ElectricCar('Nissan', 'leaf', 2024)
 
 #### 9.4.9 动手试一试
 
-```python
+练习 9.10：导入 Restaurant 类　将最新的 Restaurant 类存储在一个模块中。
+在另一个文件中导入 Restaurant 类，创建一个 Restaurant 实例，并调用 Restaurant 的一个方法，以确认 import 语句正确无误。
 
-```
+练习 9.11：导入 Admin 类　以为完成练习 9.8 而做的工作为基础。
+将 User 类、Privileges 类和 Admin 类存储在一个模块中，再创建一个文件，在其中创建一个 Admin 实例并对其调用 show_privileges()方法，以确认一切都能正确地运行。
+
+练习 9.12：多个模块　将 User 类存储在一个模块中，并将 Privileges 类和 Admin 类存储在另一个模块中。
+再创建一个文件，在其中创建一个 Admin 实例并对其调用 show_privileges()方法，以确认一切依然能够正确地运行。
 
 ### 9.5 Python 标准库
 
+Python 标准库是一组模块，在安装 Python 时已经包含在内。我们可以使用标准库中的任何函数和类，只需在程序开头添加一条简单的
+import 语句即可。
+
+`randint()` 函数接收两个整数作为参数，并随机返回一个位于这两个整数之间(包含)的整数。
+
+```python
+from random import randint
+
+print(randint(1, 100))
+```
+
+`choice` 是 `random` 模块中的另一个方法，用于在列表或元组中随机选择一项作为返回值
+
+```python
+from random import choice
+
+result1 = choice(('Watermelon', 'Mango', 'Pineapple', 'Lychee', 'Longan', 'Peach'))
+print(result1)
+result2 = choice(['Watermelon', 'Mango', 'Pineapple', 'Lychee', 'Longan', 'Peach'])
+print(result2)
+```
+
+#### 9.5.1 动手试一试
+
+练习 9.13：骰子　创建一个 Die 类，它包含一个名为 sides 的属性，该属性的默认值为 6。编写一个名为 roll_die()的方法，它打印位于 1 和骰子面数之间的随机数。创建一个 6 面的骰子并掷 10 次。
+创建一个 10 面的骰子和一个 20 面的骰子，再分别掷 10 次。
+
+```python
+
+# 练习 9.13：骰子　创建一个 Die 类，它包含一个名为 sides 的属性，该属性的默认值为 6。
+# 编写一个名为 roll_die()的方法，它打印位于 1 和骰子面数之间的随机数。
+# 创建一个 6 面的骰子并掷 10 次。
+# 创建一个 10 面的骰子和一个 20 面的骰子，再分别掷 10 次。
+from random import randint
+
+class Die:
+    """模拟骰子"""
+
+
+    def __init__(self, sides = 6):
+        self.sides = sides
+
+
+    def roll_die(self):
+        """根据当前骰子的面数进行掷骰子"""
+        print(f"Current side is {randint(1, self.sides)}.")
+
+die_0 = Die(6)
+die_1 = Die(10)
+die_2 = Die(20)
+def roll_dies(die):
+    """掷指定轮数的骰子"""
+    print(f"\nAre you ready? I'm going to roll an {die.sides}-sided die {10} times.")
+    for i in range(0, 10):
+        die.roll_die()
+
+roll_dies(die_0)
+roll_dies(die_1)
+roll_dies(die_2)
+```
+
+练习 9.14：彩票　创建一个列表或元素，其中包含 10 个数和 5 个字母。
+从这个列表或元组中随机选择 4 个数或字母，并打印一条消息，指出只要彩票上是这 4 个数或字母，就中大奖了。
+练习 9.15：彩票分析　可以使用一个循环来理解中前述彩票大奖有多难。
+为此，创建一个名为 my_ticket 的列表或元组，再编写一个循环，不断地随机选择数或字母，直到中大奖为止。
+请打印一条消息，报告执行多少次循环才中了大奖。
+
+```python
+from random import choice
+
+char_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e']
+
+# 中奖码
+winning_num = []
+for i in range(0, 4):
+    winning_num.append(choice(char_list))
+
+print(f"Winning number is {winning_num}")
+
+def draw_numbers(char_list):
+    """模拟抽奖"""
+    result = []
+    for i in range(0, 4):
+        result.append(choice(char_list))
+    equal = True
+
+    for i in range(0, 4):
+        if result[i] != winning_num[i]:
+            equal = False
+
+    return equal
+
+def total_draw():
+    count = 0
+    is_won = False
+    while not is_won:
+        is_won = draw_numbers(char_list)
+        count += 1
+        if is_won:
+            print("Wow, congratulations on your big win!")
+        else:
+            print("We regret to announce that your numbers didn't match the winning combination.")
+
+    return count
+
+print(f"You have draw {total_draw()} count.")
+```
+
+练习 9.16: Python 3 Module of the Week 　要了解 Python 标准库，一个很不错的资源是网站 Python 3 Module of the Week。请访问该网站并查看其中的目录，找一个你感兴趣的模块进行探索，从模块 random 开始可能是个不错的选择。
+
 ### 9.6 类的编程风格
+
+类名应采用驼峰命名法，即将类名中的每个单词的首字母都大写，并且不使用下划线。实例名和模块名都采用全小写格式，并在单词之间加上下划线。
+
+对于每个类，都应在类定义后面紧跟一个文档字符串。这种文档字符串简要地描述类的功能，你应该遵循编写函数的文档字符串时采用的格式约定。每个模块也都应包含一个文档字符串，对其中的类可用来做什么进行描述。
+
+可以使用空行来组织代码，但不宜过多。在类中，可以使用一个空行来分隔方法；而在模块中，可以使用两个空行来分隔类。
+
+当需要同时导入标准库中的模块和你编写的模块时，先编写导入标准库模块的 import 语句，再添加一个空行，然后编写导入你自己编写的模块的 import 语句。在包含多条 import 语句的程序中，这种做法让人更容易明白程序使用的各个模块来自哪里。
