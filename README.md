@@ -15,3 +15,7 @@
 ## 第八章 [函数](./chapter-08/index.md)
 
 ## 第九章 [类](./chapter-09/index.md)
+
+## 第十章 [文件和异常](./chapter-10/index.md)
+
+## 第十一章 [测试代码](./chapter-11/index.md)
