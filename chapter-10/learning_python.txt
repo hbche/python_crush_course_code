@@ -1,0 +1,3 @@
+In Python you can do web server.
+In Python you can do data analysis.
+In Python you can do embedded app.
