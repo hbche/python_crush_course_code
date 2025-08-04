@@ -10,7 +10,7 @@
 
 ## 第六章
 
-## 第七章
+## 第七章 [用户输入和 while 循环](./chapter-07/index.md)
 
 ## 第八章 [函数](./chapter-08/index.md)
 
@@ -19,3 +19,5 @@
 ## 第十章 [文件和异常](./chapter-10/index.md)
 
 ## 第十一章 [测试代码](./chapter-11/index.md)
+
+## 第十二章 [武装飞船](./chapter-12/index.md)
