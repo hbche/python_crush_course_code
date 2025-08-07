@@ -20,3 +20,10 @@ class Settings:
         self.bullet_color = (60, 60, 60)
         # 每次最多只能发射三发子弹
         self.bullets_allowed = 3
+
+        # 外星舰队移动的速度
+        self.alien_speed = 1.0
+        # 外星舰队移动方向标识，1 表示向右移动， -1 表示向左移动 
+        self.fleet_direction = 1
+        # 外星人舰队触碰边缘之后想下移动速度
+        self.fleet_drop_speed = 10
