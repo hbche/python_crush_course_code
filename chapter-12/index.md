@@ -621,10 +621,531 @@ if __name__ == '__main__':
 
 ### 12.8 射击
 
+添加射击功能。
+
 #### 12.8.1 添加子弹设置
+
+在 seeings.py 文件中增加子弹设置参数：
+
+```python
+class Settings:
+    """模拟设置参数"""
+
+    def __init__(self):
+        """初始化设置参数"""
+
+        # 屏幕设置
+        self.screen_width = 1200
+        self.screen_height = 800
+        self.bg_color = (230, 230, 230)
+
+        # 子弹设置
+        # 子弹的移动速度
+        self.bullet_speed = 2.0
+        # 子弹的宽度
+        self.bullet_width = 3
+        # 子弹的高度
+        self.bullet_height = 15
+        # 子弹的颜色
+        self.bullet_color = (60, 60, 60)
+```
 
 #### 12.8.2 创建 Bullet 类
 
+定义子弹类：
+
+```python bullet.py
+from pygame.sprite import Sprite
+
+import pygame
+
+class Bullet(Sprite):
+    """模拟子弹类"""
+
+    def __init__(self, ai_game):
+        """初始化子弹"""
+        super().__init__()
+        self.screen = ai_game.screen
+        self.settings = ai_game.settings
+        self.color = self.settings.bullet_color
+        self.rect = pygame.Rect(0, 0, self.settings.bullet_width, self.settings.bullet_height)
+        self.rect.midtop = ai_game.ship.rect.midtop
+
+        # 用浮点数存储子弹的 y 坐标
+        self.y = float(self.rect.y)
+
+    def update(self):
+        """向上移动子弹"""
+        # 更新子弹的准确位置
+        self.y -= self.settings.bullet_speed
+        # 更新表示子弹位置的 rect 的坐标
+        self.rect.y = self.y
+
+    def draw_bullet(self):
+        """在屏幕上绘制子弹"""
+
+        pygame.draw.rect(self.screen, self.color, self.rect)
+```
+
 #### 12.8.3 将子弹存储在编组中
 
+更新 alien_invasion.py 程序，给添加子弹编组存储发射的子弹，在时间监听中监听按键发射子弹，在更新函数中更新子弹位置，绘制子弹。
+
+```python alien_invasion.py
+import pygame
+import sys
+from settings import Settings
+from ship import Ship
+from pygame.sprite import Group
+from bullet import Bullet
+
+class AlienInvasion:
+    """模拟外星人入侵游戏"""
+
+    def __init__(self):
+        """初始化"""
+
+        # 初始化游戏并创建资源
+        pygame.init()
+        # 初始化设置
+        self.settings = Settings()
+        # 创建空白屏幕，pygame.display.set_mode方法的参数是一个表示屏幕宽高的元组
+        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        # 初始化飞船
+        self.ship = Ship(self)
+        # 初始化子弹分组
+        self.bullets = Group()
+        # 设置标题
+        pygame.display.set_caption("Alien Invasion")
+
+        self.clock = pygame.time.Clock()
+
+    def run_game(self):
+        """开始游戏的主循环"""
+
+        while True:
+            self.__check_events()
+
+            self.__update_screen()
+
+    def __check_events(self):
+        """事件检测"""
+
+        # 监听键盘和鼠标点击事件
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                self.__check_keydown_events(event)
+            elif event.type == pygame.KEYUP:
+                self.__check_keyup_events(event)
+
+    def __check_keydown_events(self, event):
+        """检测按键按下事件"""
+
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = True
+        elif event.key == pygame.K_SPACE:
+            # 增加子弹
+            new_bullet = Bullet(self)
+            # 向子弹分组中添加新加的子弹
+            self.bullets.add(new_bullet)
+        elif event.key == pygame.K_q:
+            sys.exit()
+
+    def __check_keyup_events(self, event):
+        """检测按键松开事件"""
+
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = False
+
+
+    def __update_screen(self):
+        """更新屏幕"""
+
+        # 每次循环时都重绘屏幕
+        self.screen.fill(self.settings.bg_color)
+        # 更新飞船的位置
+        self.ship.update()
+        # 调用飞船实例的 blitme() 方法，在游戏窗口上绘制飞船
+        self.ship.blitme()
+
+        # 更新子弹的位置，调用分组的update方法，该方法会调用元组内部所有子弹的update方法更新每个子弹自身的位置
+        self.bullets.update()
+        # 遍历子弹分组，绘制每个子弹
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
+        # 让最近绘制的屏幕可见
+        pygame.display.flip()
+        self.clock.tick(60)
+
+if __name__ == '__main__':
+    ai = AlienInvasion()
+    ai.run_game()
+```
+
 #### 12.8.4 开火
+
+优化逻辑，将新增子弹的逻辑抽取成 \_\_fire_bullet() 方法，在 \_\_check_events() 方法中调用
+
+```python
+import pygame
+import sys
+from settings import Settings
+from ship import Ship
+from pygame.sprite import Group
+from bullet import Bullet
+
+class AlienInvasion:
+    """模拟外星人入侵游戏"""
+
+    def __init__(self):
+        """初始化"""
+
+        # 初始化游戏并创建资源
+        pygame.init()
+        # 初始化设置
+        self.settings = Settings()
+        # 创建空白屏幕，pygame.display.set_mode方法的参数是一个表示屏幕宽高的元组
+        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        # 初始化飞船
+        self.ship = Ship(self)
+        # 初始化子弹分组
+        self.bullets = Group()
+        # 设置标题
+        pygame.display.set_caption("Alien Invasion")
+
+        self.clock = pygame.time.Clock()
+
+    def run_game(self):
+        """开始游戏的主循环"""
+
+        while True:
+            self.__check_events()
+
+            self.__update_screen()
+
+    def __check_events(self):
+        """事件检测"""
+
+        # 监听键盘和鼠标点击事件
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                self.__check_keydown_events(event)
+            elif event.type == pygame.KEYUP:
+                self.__check_keyup_events(event)
+
+    def __check_keydown_events(self, event):
+        """检测按键按下事件"""
+
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = True
+        elif event.key == pygame.K_SPACE:
+            self.__fire_bullet()
+        elif event.key == pygame.K_q:
+            sys.exit()
+
+    def __fire_bullet(self):
+        # 增加子弹
+        new_bullet = Bullet(self)
+        # 向子弹分组中添加新加的子弹
+        self.bullets.add(new_bullet)
+
+    def __check_keyup_events(self, event):
+        """检测按键松开事件"""
+
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = False
+
+
+    def __update_screen(self):
+        """更新屏幕"""
+
+        # 每次循环时都重绘屏幕
+        self.screen.fill(self.settings.bg_color)
+        # 更新飞船的位置
+        self.ship.update()
+        # 调用飞船实例的 blitme() 方法，在游戏窗口上绘制飞船
+        self.ship.blitme()
+
+        # 更新子弹的位置，调用分组的update方法，该方法会调用元组内部所有子弹的update方法更新每个子弹自身的位置
+        self.bullets.update()
+        # 遍历子弹分组，绘制每个子弹
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
+        # 让最近绘制的屏幕可见
+        pygame.display.flip()
+        self.clock.tick(60)
+
+if __name__ == '__main__':
+    ai = AlienInvasion()
+    ai.run_game()
+```
+
+#### 12.8.5 删除消失的子弹
+
+当前，虽然子弹会在抵达屏幕上边缘后消失，但这仅仅是因为 Pygame 无法在屏幕外绘制它们。这些子弹实际上依然存在，它们的 y 坐标为负数且越来越小。这是个问题，因为它们将继续消耗系统的内存和处理能力。
+
+我们需要将这些已消失的子弹删除，否则游戏所做的无谓工作将越来越多，进而变得越来越慢。为此，需要检测表示子弹的 rect 的 bottom 属性是否为零。如果是，就表明子弹已飞过屏幕上边缘：
+
+```python
+import pygame
+import sys
+from settings import Settings
+from ship import Ship
+from pygame.sprite import Group
+from bullet import Bullet
+
+class AlienInvasion:
+    """模拟外星人入侵游戏"""
+
+    def __init__(self):
+        """初始化"""
+
+        # 初始化游戏并创建资源
+        pygame.init()
+        # 初始化设置
+        self.settings = Settings()
+        # 创建空白屏幕，pygame.display.set_mode方法的参数是一个表示屏幕宽高的元组
+        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        # 初始化飞船
+        self.ship = Ship(self)
+        # 初始化子弹分组
+        self.bullets = Group()
+        # 设置标题
+        pygame.display.set_caption("Alien Invasion")
+
+        self.clock = pygame.time.Clock()
+
+    def run_game(self):
+        """开始游戏的主循环"""
+
+        while True:
+            self.__check_events()
+
+            self.__update_screen()
+
+    def __check_events(self):
+        """事件检测"""
+
+        # 监听键盘和鼠标点击事件
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                self.__check_keydown_events(event)
+            elif event.type == pygame.KEYUP:
+                self.__check_keyup_events(event)
+
+    def __check_keydown_events(self, event):
+        """检测按键按下事件"""
+
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = True
+        elif event.key == pygame.K_SPACE:
+            self.__fire_bullet()
+        elif event.key == pygame.K_q:
+            sys.exit()
+
+    def __fire_bullet(self):
+        # 增加子弹
+        new_bullet = Bullet(self)
+        # 向子弹分组中添加新加的子弹
+        self.bullets.add(new_bullet)
+
+    def __check_keyup_events(self, event):
+        """检测按键松开事件"""
+
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = False
+
+
+    def __update_screen(self):
+        """更新屏幕"""
+
+        # 每次循环时都重绘屏幕
+        self.screen.fill(self.settings.bg_color)
+        # 更新飞船的位置
+        self.ship.update()
+        # 调用飞船实例的 blitme() 方法，在游戏窗口上绘制飞船
+        self.ship.blitme()
+
+        # 更新子弹的位置，调用分组的update方法，该方法会调用元组内部所有子弹的update方法更新每个子弹自身的位置
+        self.bullets.update()
+
+        # 移除消失在屏幕外的子弹
+        for bullet in self.bullets.copy():
+            if bullet.y <= 0:
+                self.bullets.remove(bullet)
+        print(len(self.bullets))
+
+        # 遍历子弹分组，绘制每个子弹
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
+        # 让最近绘制的屏幕可见
+        pygame.display.flip()
+        self.clock.tick(60)
+
+if __name__ == '__main__':
+    ai = AlienInvasion()
+    ai.run_game()
+```
+
+#### 12.8.6 限制子弹数量
+
+更新 Setting 类，增加子弹数量限制
+
+```python
+class Settings:
+    """模拟设置参数"""
+
+    def __init__(self):
+        """初始化设置参数"""
+
+        # 屏幕设置
+        self.screen_width = 1200
+        self.screen_height = 800
+        self.bg_color = (230, 230, 230)
+
+        # 子弹设置
+        # 子弹的移动速度
+        self.bullet_speed = 2.0
+        # 子弹的宽度
+        self.bullet_width = 3
+        # 子弹的高度
+        self.bullet_height = 15
+        # 子弹的颜色
+        self.bullet_color = (60, 60, 60)
+        # 每次最多只能发射三发子弹
+        self.bullets_allowed = 3
+```
+
+抽取更新子弹的逻辑到 \_\_update_bullets() 方法中：
+
+```python
+import pygame
+import sys
+from settings import Settings
+from ship import Ship
+from pygame.sprite import Group
+from bullet import Bullet
+
+class AlienInvasion:
+    """模拟外星人入侵游戏"""
+
+    def __init__(self):
+        """初始化"""
+
+        # 初始化游戏并创建资源
+        pygame.init()
+        # 初始化设置
+        self.settings = Settings()
+        # 创建空白屏幕，pygame.display.set_mode方法的参数是一个表示屏幕宽高的元组
+        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        # 初始化飞船
+        self.ship = Ship(self)
+        # 初始化子弹分组
+        self.bullets = Group()
+        # 设置标题
+        pygame.display.set_caption("Alien Invasion")
+
+        self.clock = pygame.time.Clock()
+
+    def run_game(self):
+        """开始游戏的主循环"""
+
+        while True:
+            self.__check_events()
+
+            # 更新飞船的位置
+            self.ship.update()
+            self.__update_bullets()
+            self.__update_screen()
+
+    def __check_events(self):
+        """事件检测"""
+
+        # 监听键盘和鼠标点击事件
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                self.__check_keydown_events(event)
+            elif event.type == pygame.KEYUP:
+                self.__check_keyup_events(event)
+
+    def __check_keydown_events(self, event):
+        """检测按键按下事件"""
+
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = True
+        elif event.key == pygame.K_SPACE:
+            self.__fire_bullet()
+        elif event.key == pygame.K_q:
+            sys.exit()
+
+    def __fire_bullet(self):
+        if len(self.bullets) < self.settings.bullets_allowed:
+            # 增加子弹
+            new_bullet = Bullet(self)
+            # 向子弹分组中添加新加的子弹
+            self.bullets.add(new_bullet)
+
+    def __check_keyup_events(self, event):
+        """检测按键松开事件"""
+
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = False
+
+    def __update_bullets(self):
+        # 更新子弹的位置，调用分组的update方法，该方法会调用元组内部所有子弹的update方法更新每个子弹自身的位置
+        self.bullets.update()
+
+        # 移除消失在屏幕外的子弹
+        for bullet in self.bullets.copy():
+            if bullet.y <= 0:
+                self.bullets.remove(bullet)
+        print(len(self.bullets))
+
+
+    def __update_screen(self):
+        """更新屏幕"""
+
+        # 每次循环时都重绘屏幕
+        self.screen.fill(self.settings.bg_color)
+        # 调用飞船实例的 blitme() 方法，在游戏窗口上绘制飞船
+        self.ship.blitme()
+
+        # 遍历子弹分组，绘制每个子弹
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
+        # 让最近绘制的屏幕可见
+        pygame.display.flip()
+        self.clock.tick(60)
+
+if __name__ == '__main__':
+    ai = AlienInvasion()
+    ai.run_game()
+```
