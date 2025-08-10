@@ -68,7 +68,45 @@ if __name__ == '__main__':
 
 调用 `pygame.display.flip()`方法让最近绘制的屏幕可见。在这里，它在每次执行 while 循环时都绘制一个空屏幕，并擦去旧屏幕，使得只有新屏幕可见。我们移动游戏元素时，`pygame.display.flip()` 将不断更新屏幕，以显示元素的新位置，并且在原来的位置隐藏元素，从而营造平滑移动的效果。
 
-#### 12.3.2 设置背景色
+#### 12.3.2 控制帧率
+
+理想情况下，游戏在所有的系统中都应以相同的速度（帧率）运行。对于可在多种系统中运行的游戏，控制帧率是个复杂的问题，好在 Pygame 提供了一种相对简单的方式来达成这个目标。我们将创建一个时钟（clock）​，并确保它在主循环每次通过后都进行计时（tick）​。当这个循环的通过速度超过我们定义的帧率时，Pygame 会计算需要暂停多长时间，以便游戏的运行速度保持一致。
+
+我们在 \_\_init\_\_() 方法中初始化时钟：
+
+```python alien_invasion.py
+def __init__(self):
+    """初始化游戏并创建游戏资源"""
+
+    pygame.init()
+    self.screen = pygame.display.set_mode((1200, 800))
+    pygame.display.set_caption("外星人入侵")
+    # 初始化时钟实例
+    self.clock = pygame.timeClock()
+```
+
+然后我们在 run_game() 方法的 while 循环末尾执行计时：
+
+```python alien_invasion.py
+def run_game(self):
+    """开始游戏的主循环"""
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+        pygame.display.flip()
+        self.clock.tick(60)
+```
+
+tick() 方法接受一个表示帧率的参数，尽可能使得 while 循环每分钟执行 60 次。
+
+> 注意：在大多数系统中，使用 Pygame 提供的时钟有助于确保游戏的运行速度保持一致。如果在你的系统中，使用时钟导致游戏运行速度的一致性变差，可尝试不同的帧率值。如果找不到合适的帧率值，可不使用时钟，直接通过调整游戏的设置来让游戏在你的系统中平稳地运行。
+
+#### 12.3.3 设置背景色
+
+pygame 默认创建一个黑色的屏幕，我们可以使用 pygame.display.fill() 方法修改屏幕的背景色。
 
 ```python
 import pygame
@@ -110,7 +148,9 @@ if __name__ == '__main__':
     ai.run_game()
 ```
 
-### 12.3.3 创建设置类
+fill() 方法用于处理 surface，只接受一个表示颜色的实参。
+
+### 12.3.4 创建设置类
 
 每次给游戏添加新功能时，通常也将引入一些新设置。下面来编写一个名为 settings 的模块，在其中包含一个名为 Settings 的类，用于将所有设置都存储在一个地方，以免在代码中到处添加设置。这样，每当需要访问设置时，只需使用一个设置对象。另外，在项目增大时，这使得修改游戏的外观和行为更容易：要修改游戏，只需修改（接下来将创建的）settings.py 中的一些值，而无须查找散布在项目中的各种设置。
 
@@ -204,7 +244,9 @@ class Ship:
 
 Pygame 之所以高效，是因为它让你能够像处理矩形（rect 对象）一样处理所有的游戏元素，即便其形状并非矩形。像处理矩形一样处理游戏元素之所以高效，是因为矩形是简单的几何形状。例如，通过将游戏元素视为矩形，Pygame 能够更快地判断出它们是否发生了碰撞。这种做法的效果通常很好，游戏玩家几乎注意不到我们处理的并不是游戏元素的实际形状。在这个类中，我们将把飞船和屏幕作为矩形进行处理。
 
-我们可以调用 `pygame.image.load()` 来加载我们的飞船资源，该函数返回一个表示飞船的 surfac，我们将其存在 `self.image` 属性中。之后我们可以调用 `self.image.get_rect()` 来获取飞船图片的外接矩形，后面我们可以通过该属性指定飞船的位置。
+我们可以调用 `pygame.image.load()` 来加载我们的飞船资源，该函数返回一个表示飞船的 surface，我们将其存在 `self.image` 属性中。之后我们可以调用 `self.image.get_rect()` 来获取飞船图片的外接矩形，后面我们可以通过该属性指定飞船的位置。
+
+在处理 rect 对象时，可使用矩形的四个角及中心的 x 坐标和 y 坐标，通过设置这些值来指定矩形的位置。如果要将游戏元素居中，可设置相应 rect 对象的属性 center、centerx 或 centery；要让游戏元素与屏幕边缘对齐，可设置属性 top、bottom、left 或 right。除此之外，还有一些组合属性，如 midbottom、midtop、midleft 和 midright。要调整游戏元素的水平或垂直位置，可使用属性 x 和 y，它们分别是相应矩形左上角的 x 坐标和 y 坐标。这些属性让你无须去做游戏开发人员原本需要手动完成的计算，因此很常用。
 
 > 注意：在 Pygame 中，原点(0, 0)位于屏幕左上角，向右下方移动时，坐标值将增大。在 1200 × 800 的屏幕上，原点位于左上角，而右下角的坐标为(1200,800)。这些坐标对应的是游戏窗口，而不是物理屏幕。
 
@@ -322,7 +364,31 @@ if __name__ == '__main__':
 
 #### 12.5.1 \_check_events() 方法
 
+```python
+def _check_events(self):
+    """响应按键和鼠标事件"""
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+
+def run_game(self):
+    """开始游戏的主循环"""
+
+    while True:
+        self._check_events()
+        --snip--
+```
+
 #### 12.5.2 \_update_screen() 方法
+
+```python
+def _update_screen(self):
+    """更新屏幕上的图像，并切换到新屏幕"""
+    pygame.display.fill(self.settings.bg_color)
+    self.ship.blitme()
+    pygame.display.flip()
+```
 
 ### 12.6 驾驶飞船
 
@@ -420,6 +486,7 @@ class AlienInvasion:
         self.ship = Ship(self)
         # 设置标题
         pygame.display.set_caption("Alien Invasion")
+        self.clock = pygame.time.Clock()
 
     def run_game(self):
         """开始游戏的主循环"""
@@ -428,6 +495,8 @@ class AlienInvasion:
             self.__check_events()
 
             self.__update_screen()
+
+            self.check.tick(60)
 
     def __check_events(self):
         """事件检测"""
@@ -615,9 +684,31 @@ if __name__ == '__main__':
     ai.run_game()
 ```
 
-#### 12.6.8 在全屏模式下运行游戏
+#### 12.6.9 在全屏模式下运行游戏
+
+pygame 支持全屏：
+
+```python
+def __init__(self):
+
+    pygame.init()
+    self.settings = Settings()
+    # 设置全屏
+    self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    # 根据全屏尺寸更新设置中的屏幕尺寸
+    self.settings.screen_width = self.screen.get_rect().width
+    self.settings.screen_height = self.screen.get_rect().height
+
+    pygame.display.set_caption('外星人入侵')
+```
 
 ### 12.7 简单回顾
+
+#### 12.7.1 alien_invasion.py
+
+#### 12.7.2 settings.py
+
+#### 12.7.3 ship.py
 
 ### 12.8 射击
 
@@ -686,6 +777,8 @@ class Bullet(Sprite):
 
         pygame.draw.rect(self.screen, self.color, self.rect)
 ```
+
+Bullet 类继承了从模块 pygame.sprite 导入的 Sprite 类。通过使用精灵（sprite）​，可将游戏中相关的元素编组，进而同时操作编组中的所有元素。为了创建子弹实例，**init**() 需要当前的 AlienInvasion 实例，因此调用 super() 来继承 Sprite。另外，还定义了用于存储屏幕和设置对象以及表示子弹颜色的属性。
 
 #### 12.8.3 将子弹存储在编组中
 
