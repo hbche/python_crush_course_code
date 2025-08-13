@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-q)_541k=iq(^g4p#kr4oswzn%-2^1+q8q4$lw68m-vlm+wlwlq'
+SECRET_KEY = 'django-insecure-w62pzakz9)_j-+yed&#14#mcwbf9d%jajv$p(+$rjbh!w!tlmg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,6 +31,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # 我们的应用，需要在Django默认应用前面，以免被默认应用覆盖
+    'learning_logs',
+    
+    # Django默认添加的应用
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
